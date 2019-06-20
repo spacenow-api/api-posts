@@ -3,8 +3,8 @@ import validationMiddleware from '../helpers/middlewares/validation-middleware';
 import postDTO from './post.dto';
 import IPost from './post.interface';
 import postsMock from '../helpers/mocks/posts.mock';
-import RequestWithUser from "../helpers/interfaces/requestWithUser.interface";
-import authMiddleware from "../helpers/middlewares/auth-middleware";
+import RequestWithUser from '../helpers/interfaces/requestWithUser.interface';
+import authMiddleware from '../helpers/middlewares/auth-middleware';
  
 class PostsController {
 
@@ -21,19 +21,19 @@ class PostsController {
     this.router.patch(this.path, authMiddleware, validationMiddleware(postDTO, true), this.createPost);
   }
  
-  private getAllPosts = async (req: RequestWithUser, res: Response) => {
-    res.send(postsMock);
+  private getAllPosts = async (request: RequestWithUser, response: Response) => {
+    response.send(postsMock);
   }
  
-  private createPost = async (req: RequestWithUser, res: Response) => {
-    const postData: postDTO = req.body;
-    if(req.user) {
+  private createPost = async (request: RequestWithUser, response: Response) => {
+    const postData: postDTO = request.body;
+    if(request.user) {
       const createdPost:IPost = {
         ...postData,
-        authorId: req.user.id,
+        authorId: request.user.id,
       };
       postsMock.concat(createdPost);
-      res.send(createdPost);
+      response.send(createdPost);
     }
   }
 

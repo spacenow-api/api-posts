@@ -4,27 +4,19 @@ import AuthenticationTokenMissingException from '../exceptions/AuthenticationTok
 import WrongAuthenticationTokenException from '../exceptions/WrongAuthenticationTokenException';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import { DataStoredInToken } from '../../token/token.interface';
+import TokenController from '../../token/token.controller';
 import usersMock from '../mocks/users.mock';
-import tokenMiddleware from './token-middleware'
 
-export default async (req: RequestWithUser, res: Response, next: NextFunction) => {
-
-  let token = await tokenMiddleware(req);
-
+async function authMiddleware(request: RequestWithUser, response: Response, next: NextFunction) {
+  const token = new TokenController().getToken(request);
   if (token) {
-    const secret:string = process.env.JWT_SECRET || 'Spacenow';
+    const secret:string = process.env.JWT_SECRET || 'Lucas';
     try {
       const verificationResponse:DataStoredInToken = jwt.verify(token, secret) as DataStoredInToken;
-      console.log("Verification Response", verificationResponse)
       const id = verificationResponse.id;
-      console.log("ID", id)
-      const user = await usersMock.find(user => {
-        console.log("USER ID", user.id)
-        return user.id === id
-      });
-      console.log(user)
+      const user = usersMock.find(user => user.id === id);
       if (user) {
-        req.user = user;
+        request.user = user;
         next();
       } else {
         next(new WrongAuthenticationTokenException());
@@ -36,3 +28,5 @@ export default async (req: RequestWithUser, res: Response, next: NextFunction) =
     next(new AuthenticationTokenMissingException());
   }
 }
+ 
+export default authMiddleware;
