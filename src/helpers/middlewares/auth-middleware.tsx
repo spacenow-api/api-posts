@@ -10,7 +10,7 @@ import usersMock from '../mocks/users.mock';
 async function authMiddleware(request: RequestWithUser, response: Response, next: NextFunction) {
   const token = new TokenController().getToken(request);
   if (token) {
-    const secret:string = process.env.JWT_SECRET || 'Lucas';
+    const secret:string = process.env.JWT_SECRET || 'Spacenow';
     try {
       const verificationResponse:DataStoredInToken = jwt.verify(token, secret) as DataStoredInToken;
       const id = verificationResponse.id;
